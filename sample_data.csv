@@ -1,0 +1,4 @@
+time,soil_moisture_percent,nitrogen_demo_units,phosphorus_demo_units,potassium_demo_units,light_lux_demo,leaf_colour_indicator,data_type
+09:00,42,50,30,60,8500,Green reference,SIMULATED
+09:10,31,47,28,55,3200,Paler than reference,SIMULATED
+09:20,58,63,35,71,12000,Green reference,SIMULATED

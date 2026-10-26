@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grow Bot Sphere | Greens Monitor</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f8f4;color:#173126}header{background:#176b45;color:white;padding:22px}main{max-width:1000px;margin:auto;padding:16px}.notice{background:#fff3d3;border:1px solid #e1c66c;padding:14px;border-radius:10px;line-height:1.5}.bar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}button{padding:11px 14px;border:0;border-radius:8px;background:#176b45;color:white;font-weight:bold;cursor:pointer}.secondary{background:white;color:#176b45;border:1px solid #ccdacf}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.card{background:white;border:1px solid #dce7df;border-radius:12px;padding:16px}.label{color:#61736a}.value{font-size:1.7rem;font-weight:bold;margin:8px 0}.small{font-size:.85rem;color:#61736a;line-height:1.5}h2{font-size:1.2rem;margin:22px 0 10px}.status{background:#e7f5ec;border:1px solid #dce7df;border-radius:10px;padding:14px;line-height:1.5}.tablewrap{overflow:auto;background:white;border:1px solid #dce7df;border-radius:10px}table{border-collapse:collapse;width:100%;min-width:650px}td,th{text-align:left;padding:10px;border-bottom:1px solid #dce7df;font-size:.9rem}th{background:#edf5ef}footer{text-align:center;padding:20px;color:#61736a;font-size:.85rem}
+</style></head><body>
+<header><h1>🌱 Grow Bot Sphere</h1><div>Soil nutrient and leaf-condition monitoring for green leafy vegetables</div></header>
+<main>
+<div class="notice"><b>DEMO MODE — SIMULATED DATA ONLY.</b> This dashboard currently uses example values generated in your browser. It is not connected to physical sensors. Do not treat these values as real farm measurements.</div>
+<div class="bar"><button id="refresh">Generate new demo readings</button><button class="secondary" id="download">Download readings CSV</button></div>
+<div class="grid">
+<div class="card"><div class="label">Soil moisture</div><div class="value"><span id="moisture">—</span> %</div><div class="small">Example value; sensor calibration required.</div></div>
+<div class="card"><div class="label">Nitrogen (N)</div><div class="value" id="n">—</div><div class="small">Arbitrary demo units, not nutrient concentration.</div></div>
+<div class="card"><div class="label">Phosphorus (P)</div><div class="value" id="p">—</div><div class="small">Arbitrary demo units, not nutrient concentration.</div></div>
+<div class="card"><div class="label">Potassium (K)</div><div class="value" id="k">—</div><div class="small">Arbitrary demo units, not nutrient concentration.</div></div>
+<div class="card"><div class="label">Ambient light</div><div class="value"><span id="light">—</span> lux</div><div class="small">Lux is not a direct photosynthesis measurement.</div></div>
+<div class="card"><div class="label">Leaf colour indicator</div><div class="value" id="leaf">—</div><div class="small">Not a disease or nutrient diagnosis.</div></div>
+</div>
+<h2>Plant observation</h2><div class="status" id="assessment" aria-live="polite">Generating demo values…</div>
+<h2>Recent demo readings</h2><div class="tablewrap"><table><thead><tr><th>Time</th><th>Moisture %</th><th>N</th><th>P</th><th>K</th><th>Light lux</th><th>Leaf indicator</th><th>Data type</th></tr></thead><tbody id="history"></tbody></table></div>
+<p class="small">Photosynthesis note: this prototype monitors related indicators only. A basic light sensor and leaf-colour sensor do not directly measure photosynthesis rate. Actual photosynthetic performance requires specialised equipment and validation.</p>
+</main><footer>Grow Bot Sphere • Student prototype • Simulated readings only</footer>
+<script>
+(()=>{const history=[];const $=id=>document.getElementById(id);const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+function newReading(){return {time:new Date().toLocaleTimeString(),moisture:rnd(25,75),n:rnd(15,90),p:rnd(10,60),k:rnd(20,100),light:rnd(1500,22000),leaf:["Green reference","Paler than reference","Darker than reference"][rnd(0,2)],dataType:"SIMULATED"}}
+function render(){const r=history[0];["moisture","n","p","k","light","leaf"].forEach(k=>$(k).textContent=typeof r[k]==="number"?r[k].toLocaleString():r[k]);
+let notes=[];if(r.moisture<35)notes.push("Demo moisture is relatively low; inspect the soil before deciding whether to water.");else if(r.moisture>65)notes.push("Demo moisture is relatively high; check drainage and confirm with a calibrated sensor.");else notes.push("Demo moisture is in the example middle range.");if(r.light<4000)notes.push("Demo light reading is low; compare readings at different times and check shading.");if(r.leaf!=="Green reference")notes.push("Leaf colour differs from the reference; inspect the plant under consistent lighting.");notes.push("NPK values are arbitrary demo units. Do not use them to prescribe fertiliser.");notes.push("No photosynthesis rate or disease diagnosis is calculated.");
+$("assessment").innerHTML="<b>Demo-only observations</b><ul>"+notes.map(x=>"<li>"+x+"</li>").join("")+"</ul>";
+$("history").innerHTML=history.map(x=>"<tr><td>"+x.time+"</td><td>"+x.moisture+"</td><td>"+x.n+"</td><td>"+x.p+"</td><td>"+x.k+"</td><td>"+x.light+"</td><td>"+x.leaf+"</td><td>"+x.dataType+"</td></tr>").join("")}
+function refresh(){history.unshift(newReading());if(history.length>8)history.pop();render()}
+$("refresh").addEventListener("click",refresh);$("download").addEventListener("click",()=>{const rows=[["time","soil_moisture_percent","nitrogen_demo_units","phosphorus_demo_units","potassium_demo_units","light_lux_demo","leaf_colour_indicator","data_type"],...history.map(r=>[r.time,r.moisture,r.n,r.p,r.k,r.light,r.leaf,r.dataType])];const csv=rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(",")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="grow-bot-sphere-demo-readings.csv";a.click();URL.revokeObjectURL(a.href)});refresh()})();
+</script></body></html>
